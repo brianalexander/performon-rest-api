@@ -1,4 +1,4 @@
-const { User } = require("../models/User.model");
+// const { User } = require("../models/User.model");
 const { Device } = require("../models/Device.model");
 
 async function getDevice(req, res, next) {

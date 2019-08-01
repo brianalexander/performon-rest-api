@@ -76,6 +76,7 @@ async function createUser(req, res, next) {
 async function updateUser(req, res, next) {
   console.log("updateUser");
   try {
+    console.log(req.params.userUUID);
     const numUpdated = await User.query()
       .update({})
       .where("uuid", req.params.userUUID);
