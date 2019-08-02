@@ -327,5 +327,5 @@ module.exports = {
   updateUser,
   getAllUsers,
   getAllDevicesForUser,
-  flagUserAsDeleted
+  deleteUser
 };
