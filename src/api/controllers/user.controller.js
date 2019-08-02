@@ -284,7 +284,42 @@ async function getAllDevicesForUser(req, res, next) {
   }
 }
 
-async function flagUserAsDeleted(req, res, next) {}
+/**
+ * @api {delete} /users/:uuid Get and return user's devices
+ * @apiVersion 0.0.1
+ * @apiName DeleteUser
+ * @apiGroup User
+ * @apiPermission None
+ *
+ * @apiParam {String} uuid User's unique ID.
+ *
+ * @apiSuccessExample Success-Response:
+ *      HTTP/1.1 204 OK
+ *      {}
+ *
+ * @apiError UserNotFound The <code>uuid</code> of the User was not found.
+ *
+ * @apiErrorExample Error-Response:
+ *      HTTP/1.1 404 Not Found
+ *      {
+ *        "error": "UserNotFound"
+ *      }
+ */
+
+/**
+ * This function is the controller for the delete route /v1/users/:uuid.
+ * Delete the user from the database
+ *
+ * @function
+ * @async
+ *
+ * @param {Object} req The incoming request object.
+ * @param {Object} req.params Parameters parsed from the address bar.
+ * @param {String} req.params.uuid Requested user's uuid.
+ * @param {Object} res The outgoing response object.
+ * @param {Object} next Express object, continues to next middleware.
+ */
+async function deleteUser(req, res, next) {}
 
 module.exports = {
   getUser,

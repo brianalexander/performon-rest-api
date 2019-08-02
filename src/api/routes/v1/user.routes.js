@@ -5,7 +5,7 @@ const {
   updateUser,
   getAllUsers,
   getAllDevicesForUser,
-  flagUserAsDeleted
+  deleteUser
 } = require("../../controllers/user.controller");
 
 const router = express.Router();
@@ -19,7 +19,7 @@ router
   .route("/:uuid")
   .get(getUser)
   .put(updateUser)
-  .delete(flagUserAsDeleted);
+  .delete(deleteUser);
 
 router.route("/:uuid/devices").get(getAllDevicesForUser);
 
