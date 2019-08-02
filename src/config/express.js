@@ -22,4 +22,20 @@ app.use(cors());
 // add routes
 app.use("/v1", routes);
 
+app.use((req, res, next) => {
+  const error = new Error("Invalid URI.");
+  error.status = 404;
+  next(error);
+});
+
+app.use(function(err, req, res, next) {
+  console.log(err);
+  res.status(err.status || 500);
+  res.json({
+    error: {
+      message: error.message
+    }
+  });
+});
+
 module.exports = app;
