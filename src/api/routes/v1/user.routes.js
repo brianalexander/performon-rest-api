@@ -1,4 +1,5 @@
 const express = require("express");
+
 const {
   getUser,
   createUser,
@@ -8,19 +9,21 @@ const {
   deleteUser
 } = require("../../controllers/user.controller");
 
+const { exceptionHandler } = require("../../utils/errors");
+
 const router = express.Router();
 
 router
   .route("/")
-  .get(getAllUsers)
-  .post(createUser);
+  .get(exceptionHandler(getAllUsers))
+  .post(exceptionHandler(createUser));
 
 router
   .route("/:uuid")
-  .get(getUser)
-  .put(updateUser)
-  .delete(deleteUser);
+  .get(exceptionHandler(getUser))
+  .put(exceptionHandler(updateUser))
+  .delete(exceptionHandler(deleteUser));
 
-router.route("/:uuid/devices").get(getAllDevicesForUser);
+router.route("/:uuid/devices").get(exceptionHandler(getAllDevicesForUser));
 
 module.exports = router;

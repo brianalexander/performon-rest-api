@@ -1,5 +1,6 @@
 // const { Device } = require("../models/Device.model");
 const { User } = require("../models/User.model");
+const { UserNotFoundError } = require("../utils/errors");
 const uuidv4 = require("uuid/v4");
 
 /**
@@ -46,16 +47,11 @@ const uuidv4 = require("uuid/v4");
  * @param {Object} next Express object, continues to next middleware.
  */
 async function getUser(req, res, next) {
-  console.log(req.params);
-  try {
-    const userArray = await User.query().where("uuid", req.params.uuid);
-    if (userArray.length === 0) {
-      res.status(404).json({ Error: "User not found." });
-    }
-    res.status(200).json(userArray[0]);
-  } catch (err) {
-    console.log(err);
+  const userArray = await User.query().where("uuid", req.params.uuid);
+  if (userArray.length === 0) {
+    throw new UserNotFoundError();
   }
+  res.status(200).json(userArray[0]);
 }
 
 /**
@@ -91,19 +87,14 @@ async function getUser(req, res, next) {
  * @param {Object} next Express object, continues to next middleware.
  */
 async function createUser(req, res, next) {
+  // TODO: attempt to create uuid, if collision occurs, repeat
   console.log("POST /user", req.body);
-  try {
-    const uuid = uuidv4();
-    const newUser = await User.query().insert({ uuid: uuid });
-    console.log("user inserted");
-    res.status(201).json({
-      user: newUser,
-      url: `http://localhost:9090/v1/users/${uuid}`
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ Error: err });
-  }
+  const uuid = uuidv4();
+  const newUser = await User.query().insert({ uuid: uuid });
+  res.status(201).json({
+    user: newUser,
+    url: `http://localhost:9090/v1/users/${uuid}`
+  });
 }
 
 /**
@@ -142,25 +133,17 @@ async function createUser(req, res, next) {
  */
 async function updateUser(req, res, next) {
   console.log("updateUser");
-  try {
-    console.log(req.params.uuid);
-    const numUpdated = await User.query()
-      .update({})
-      .where("uuid", req.params.uuid);
-    console.log(numUpdated);
-    if (numUpdated === 1) {
-      console.log("successfully updated");
-      res.sendStatus(204);
-    } else if (numUpdated === 0) {
-      console.log("user not found");
-      res.sendStatus(404);
-    } else {
-      res.sendStatus(500);
-      console.log("critical", ":", "More than one user updated.");
-    }
-  } catch (err) {
-    console.log(err);
-    res.sendStatus(500);
+  console.log(req.params.uuid);
+  const numUpdated = await User.query()
+    .update({ uuid: req.params.uuid })
+    .where("uuid", req.params.uuid);
+  if (numUpdated === 1) {
+    console.log("successfully updated");
+    res.sendStatus(204);
+  } else if (numUpdated === 0) {
+    throw new UserNotFoundError();
+  } else {
+    throw new CriticalError("More than one user updated.");
   }
 }
 
@@ -255,33 +238,28 @@ async function getAllUsers(req, res, next) {
  * @param {Object} next Express object, continues to next middleware.
  */
 async function getAllDevicesForUser(req, res, next) {
-  try {
-    const userArray = await User.query()
-      .where("uuid", req.params.uuid)
-      .eager("devices");
-    if (userArray.length === 0) {
-      res.status(404).json({ Error: "User not found." });
-    }
-    const [user] = userArray;
-
-    const devices = user.devices.map(device => {
-      return {
-        id: device.id,
-        hashId: device.hash_id,
-        osType: device.os_type,
-        cpuModel: device.cpu_model,
-        totalMem: device.total_mem,
-        numLogicalCores: device.num_logical_cores,
-        cpuSpeed: device.cpu_speed,
-        userUUID: device.user_uuid
-      };
-    });
-    console.log(devices);
-
-    res.status(200).json(devices);
-  } catch (err) {
-    res.status(500).json({ Error: err });
+  const userArray = await User.query()
+    .where("uuid", req.params.uuid)
+    .eager("devices");
+  if (userArray.length === 0) {
+    throw new UserNotFoundError();
   }
+  const [user] = userArray;
+
+  const devices = user.devices.map(device => {
+    return {
+      id: device.id,
+      hashId: device.hash_id,
+      osType: device.os_type,
+      cpuModel: device.cpu_model,
+      totalMem: device.total_mem,
+      numLogicalCores: device.num_logical_cores,
+      cpuSpeed: device.cpu_speed,
+      userUUID: device.user_uuid
+    };
+  });
+
+  res.status(200).json(devices);
 }
 
 /**

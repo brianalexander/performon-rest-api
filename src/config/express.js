@@ -23,17 +23,26 @@ app.use(cors());
 app.use("/v1", routes);
 
 app.use((req, res, next) => {
-  const error = new Error("Invalid URI.");
-  error.status = 404;
+  const error = new Error(
+    ["URL not supported -", req.method, "to", req.originalUrl].join(" ")
+  );
+  error.statusCode = 404;
   next(error);
 });
 
 app.use(function(err, req, res, next) {
-  console.log(err);
-  res.status(err.status || 500);
-  res.json({
+  console.error(err.message);
+
+  const statusCode = err.statusCode || 500;
+  const message =
+    statusCode === 500
+      ? err.message.split(" - ")[1].replace(/"/g, "")
+      : err.message;
+
+  res.status(statusCode).json({
     error: {
-      message: error.message
+      code: statusCode,
+      message: message
     }
   });
 });

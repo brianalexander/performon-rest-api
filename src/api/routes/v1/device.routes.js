@@ -1,4 +1,5 @@
 const express = require("express");
+
 const {
   getAllDevices,
   createDevice,
@@ -8,22 +9,25 @@ const {
   getDeviceMetrics,
   addDeviceMetrics
 } = require("../../controllers/device.controller");
+
+const { exceptionHandler } = require("../../utils/errors");
+
 const router = express.Router();
 
 router
   .route("/")
-  .get(getAllDevices)
-  .post(createDevice);
+  .get(exceptionHandler(getAllDevices))
+  .post(exceptionHandler(createDevice));
 
 router
   .route("/:deviceHash")
-  .get(getDevice)
-  .put(updateDevice)
-  .delete(flagDeviceAsDeleted);
+  .get(exceptionHandler(getDevice))
+  .put(exceptionHandler(updateDevice))
+  .delete(exceptionHandler(flagDeviceAsDeleted));
 
 router
   .route("/:deviceHash/metrics")
-  .get(getDeviceMetrics)
-  .post(addDeviceMetrics);
+  .get(exceptionHandler(getDeviceMetrics))
+  .post(exceptionHandler(addDeviceMetrics));
 
 module.exports = router;
