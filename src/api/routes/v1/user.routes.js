@@ -16,11 +16,11 @@ router
   .post(createUser);
 
 router
-  .route("/:userUUID")
+  .route("/:uuid")
   .get(getUser)
   .put(updateUser)
   .delete(flagUserAsDeleted);
 
-router.route("/:userUUID/devices").get(getAllDevicesForUser);
+router.route("/:uuid/devices").get(getAllDevicesForUser);
 
 module.exports = router;
